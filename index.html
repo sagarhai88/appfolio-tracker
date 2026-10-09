@@ -71,6 +71,7 @@
   table.grid .note{color:var(--warn);font-size:12px;margin-top:1px}
   table.grid tr.alldone .name{color:var(--muted)}
   table.grid th .sub{display:block;font-weight:500;letter-spacing:0;text-transform:none;margin-top:2px}
+  table.grid th .selall{display:block;margin:6px auto 0;font-size:11px;padding:2px 7px;text-transform:none;letter-spacing:0;font-weight:500}
   @media (max-width:600px){ table.grid th.c,table.grid td.c{width:70px} table.grid .props{display:none} }
   /* calendar */
   .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
@@ -235,7 +236,7 @@
     let tot=0,don=0; const cols=C.monthly.map(task=>{ const st=taskStatus(task,p); tot+=st.total; don+=st.done; return {task,st}; });
     html+=`<div class="progress"><i style="width:${tot?100*don/tot:0}%"></i></div><div style="font-size:13px;color:var(--muted);margin:-8px 0 14px">${don} of ${tot} items complete</div>`;
     html+=`<div class="card" style="padding:6px 10px"><table class="grid"><thead><tr><th>Bank account</th>`;
-    for(const {task,st} of cols.filter(c=>c.task.perBank)){ const cls=st.complete?'done':st.overdue?'over':''; html+=`<th class="c">${task.label.replace('bank account','')}<span class="sub"><span class="due ${cls}">${st.complete?'Complete':(st.overdue?'Overdue · ':'')+(startDate(task,p)&&!st.overdue?fmt(startDate(task,p))+'–'+st.due.getDate():'Due '+fmt(st.due))}</span></span></th>`; }
+    for(const {task,st} of cols.filter(c=>c.task.perBank)){ const cls=st.complete?'done':st.overdue?'over':''; html+=`<th class="c">${task.label.replace('bank account','')}<span class="sub"><span class="due ${cls}">${st.complete?'Complete':(st.overdue?'Overdue · ':'')+(startDate(task,p)&&!st.overdue?fmt(startDate(task,p))+'–'+st.due.getDate():'Due '+fmt(st.due))}</span></span><button class="btn small selall" data-task="${task.id}" data-all="${st.complete?0:1}">${st.complete?'Clear all':'Select all'}</button></th>`; }
     html+=`</tr></thead><tbody>`;
     for(const b of C.banks){
       const all=cols.every(({task})=>task.perBank?get(p,task.id+':'+b.id):true);
@@ -249,6 +250,7 @@
     $('#view').innerHTML=html;
     $('#prev').onclick=()=>{period=shift(period,-1);render()}; $('#next').onclick=()=>{period=shift(period,1);render()};
     $('#thisMonth').onclick=()=>{period=shift(ym(today),-1);render()};
+    document.querySelectorAll('.selall').forEach(btn=>btn.onclick=()=>{ const all=btn.dataset.all==='1'; const t=btn.dataset.task; status[p]=status[p]||{}; for(const b of C.banks){ const k=t+':'+b.id; if(all) status[p][k]={done:true,by:name(),at:new Date().toISOString()}; else delete status[p][k]; } if(C.sync&&C.sync.repo&&!token()) banner('Saved in this browser only — add your GitHub token in Settings so the team sees it.','',6000); queueSave(); render(); });
     bindChecks();
   }
 
