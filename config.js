@@ -61,7 +61,7 @@ window.TRACKER_CONFIG = {
   //   startDay:      optional — first day of the working window (shown on the calendar)
   //   followingMonth: true = due in the month AFTER the period (Sept work done in October)
   monthly: [
-    { id: "recon",         label: "Reconcile bank account", perBank: true,  startDay: 1, dueDay: 6,      followingMonth: true  },
+    { id: "recon",         label: "Reconcile bank account", perBank: true,  startDay: 1, dueDay: 7,      followingMonth: true  },
     { id: "rent-receipts", label: "Enter rent receipts",    perBank: true,  dueDay: 5,                   followingMonth: false },
     { id: "placeholder-gl",label: "Clean up PLACEHOLDER GL",perBank: false, dueDay: "last",              followingMonth: false },
   ],
