@@ -11,19 +11,19 @@
     --bg:#f5f4f0; --surface:#ffffff; --surface-2:#faf9f6; --line:#e4e1da;
     --text:#1b1a17; --muted:#6b675f; --accent:#1f5f8b; --accent-soft:#e3eef6;
     --ok:#2e7d4f; --ok-soft:#e2f2e8; --warn:#b4650d; --warn-soft:#fdf0df;
-    --bad:#b3261e; --bad-soft:#fbe5e3; --radius:10px;
+    --bad:#b3261e; --bad-soft:#fbe5e3; --stripe:#f1efe9; --radius:10px;
   }
   @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
     --bg:#15161a; --surface:#1e2026; --surface-2:#23262d; --line:#30333b;
     --text:#ecebe6; --muted:#9a9890; --accent:#6ab0e0; --accent-soft:#1e3243;
     --ok:#6ccf93; --ok-soft:#1d3528; --warn:#f0a94a; --warn-soft:#3d2c14;
-    --bad:#f08a82; --bad-soft:#44201d;
+    --bad:#f08a82; --bad-soft:#44201d; --stripe:#262932;
   }}
   :root[data-theme="dark"]{
     --bg:#15161a; --surface:#1e2026; --surface-2:#23262d; --line:#30333b;
     --text:#ecebe6; --muted:#9a9890; --accent:#6ab0e0; --accent-soft:#1e3243;
     --ok:#6ccf93; --ok-soft:#1d3528; --warn:#f0a94a; --warn-soft:#3d2c14;
-    --bad:#f08a82; --bad-soft:#44201d;
+    --bad:#f08a82; --bad-soft:#44201d; --stripe:#262932;
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Inter,system-ui,sans-serif}
@@ -32,6 +32,10 @@
   header h1{font-size:20px;font-weight:700;margin:0;letter-spacing:-.01em}
   header .owner{color:var(--muted);font-size:13px}
   .spacer{flex:1}
+  .today-box{text-align:right;line-height:1.1}
+  .today-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .today-date{font-size:22px;font-weight:700;letter-spacing:-.01em}
+  @media (max-width:600px){ .today-date{font-size:18px} }
   .btn{border:1px solid var(--line);background:var(--surface);color:var(--text);padding:7px 12px;border-radius:8px;font:inherit;font-size:14px;cursor:pointer}
   .btn:hover{border-color:var(--accent)}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -63,6 +67,9 @@
   table.grid th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
   table.grid th.c,table.grid td.c{text-align:center;width:120px}
   table.grid td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+  table.grid tbody tr:nth-child(odd) td{background:var(--stripe)}
+  table.grid th.c,table.grid td.c{border-left:1px solid var(--line)}
+  table.grid tbody tr:hover td{background:var(--accent-soft)}
   table.grid tr:last-child td{border-bottom:0}
   table.grid td.c input{width:22px;height:22px;accent-color:var(--ok);cursor:pointer;display:block;margin:0 auto}
   table.grid td.c .meta{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap}
@@ -114,6 +121,7 @@
       <div class="owner" id="owner"></div>
     </div>
     <div class="spacer"></div>
+    <div class="today-box"><div class="today-label">Today</div><div class="today-date" id="todayDate"></div></div>
     <span id="who" style="font-size:13px;color:var(--muted)"></span>
     <button class="btn" id="settingsBtn">Settings</button>
   </header>
@@ -312,7 +320,7 @@
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{view=t.dataset.view;render()});
 
   // ---------- init ----------
-  $('#title').textContent=C.title; document.title=C.title; $('#owner').textContent=C.owner;
+  $('#title').textContent=C.title; document.title=C.title; $('#owner').textContent=C.owner; $('#todayDate').textContent=today.toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric',year:'numeric'});
   render(); load().then(render);
 })();
 </script>
