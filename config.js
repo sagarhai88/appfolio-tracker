@@ -66,10 +66,9 @@ window.TRACKER_CONFIG = {
     { id: "placeholder-gl",label: "Clean up PLACEHOLDER GL",perBank: false, dueDay: "last",              followingMonth: false },
   ],
 
-  // Yearly tasks. "dueDate" is MM-DD. Add as needed.
+  // Yearly tasks — same bank grid as monthly. "dueDate" is MM-DD.
   yearly: [
-    // { id: "1099s",      label: "Issue 1099s to vendors",         dueDate: "01-31" },
-    // { id: "cam-recon",  label: "CAM / NNN reconciliations",      dueDate: "03-31" },
-    // { id: "tax-return", label: "Entity tax returns to CPA",      dueDate: "03-15" },
+    { id: "budget", label: "Create next year budget", perBank: true, dueDate: "12-15" },
+    { id: "cam",    label: "Set up CAM for tenants",  perBank: true, dueDate: "12-15" },
   ],
 };
