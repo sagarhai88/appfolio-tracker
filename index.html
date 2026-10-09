@@ -58,6 +58,20 @@
   .row .note{color:var(--warn);font-size:12.5px;margin-top:2px}
   .row .meta{color:var(--muted);font-size:12px;white-space:nowrap;margin-top:3px}
   .empty{color:var(--muted);padding:14px 6px;font-size:14px}
+  /* checklist grid */
+  table.grid{width:100%;border-collapse:collapse}
+  table.grid th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+  table.grid th.c,table.grid td.c{text-align:center;width:120px}
+  table.grid td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+  table.grid tr:last-child td{border-bottom:0}
+  table.grid td.c input{width:22px;height:22px;accent-color:var(--ok);cursor:pointer;display:block;margin:0 auto}
+  table.grid td.c .meta{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap}
+  table.grid .name{font-weight:500}
+  table.grid .props{color:var(--muted);font-size:12px;margin-top:1px}
+  table.grid .note{color:var(--warn);font-size:12px;margin-top:1px}
+  table.grid tr.alldone .name{color:var(--muted)}
+  table.grid th .sub{display:block;font-weight:500;letter-spacing:0;text-transform:none;margin-top:2px}
+  @media (max-width:600px){ table.grid th.c,table.grid td.c{width:70px} table.grid .props{display:none} }
   /* calendar */
   .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
   .cal .dow{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:center;padding:4px 0}
@@ -194,7 +208,8 @@
   // ---------- helpers ----------
   const get = (p,k) => (status[p]||{})[k];
   function setDone(p,k,done){ status[p]=status[p]||{}; if(done) status[p][k]={done:true,by:name(),at:new Date().toISOString()}; else delete status[p][k]; queueSave(); render(); }
-  function dueDate(task,p){ const [y,m]=p.split('-').map(Number); const d=new Date(y,m-1+(task.followingMonth?1:0),task.dueDay||1); return d; }
+  function dueDate(task,p){ const [y,m]=p.split('-').map(Number); const mm=m-1+(task.followingMonth?1:0); return task.dueDay==='last'?new Date(y,mm+1,0):new Date(y,mm,task.dueDay||1); }
+  function startDate(task,p){ if(!task.startDay) return null; const [y,m]=p.split('-').map(Number); return new Date(y,m-1+(task.followingMonth?1:0),task.startDay); }
   const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
   const fmtAt = iso => new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'});
   function periodLabel(p){ const [y,m]=p.split('-').map(Number); return MONTHS[m-1]+' '+y; }
@@ -218,16 +233,20 @@
 
   function renderChecklist(){
     const p=period; let html=`<div class="nav"><button class="btn small" id="prev">‹</button><h2>${periodLabel(p)}</h2><button class="btn small" id="next">›</button><div class="spacer"></div><button class="btn small" id="thisMonth">Last month</button></div>`;
-    let tot=0,don=0;
-    const sections=C.monthly.map(task=>{ const st=taskStatus(task,p); tot+=st.total; don+=st.done; return {task,st}; });
+    let tot=0,don=0; const cols=C.monthly.map(task=>{ const st=taskStatus(task,p); tot+=st.total; don+=st.done; return {task,st}; });
     html+=`<div class="progress"><i style="width:${tot?100*don/tot:0}%"></i></div><div style="font-size:13px;color:var(--muted);margin:-8px 0 14px">${don} of ${tot} items complete</div>`;
-    for(const {task,st} of sections){
-      const dueCls=st.complete?'done':st.overdue?'over':'';
-      html+=`<div class="card"><h3>${task.label}${task.perBank?'s':''} <span class="due ${dueCls}">${st.complete?'Complete':(st.overdue?'Overdue · ':'Due ')+fmt(st.due)}</span>${task.perBank?`<span class="due">${st.done}/${st.total}</span>`:''}</h3>`;
-      if(task.perBank){ for(const b of C.banks) html+=rowHtml(p,task.id+':'+b.id,b.name,b.properties.join(' · '),b.note); }
-      else html+=rowHtml(p,task.id,task.label,'','');
-      html+=`</div>`;
+    html+=`<div class="card" style="padding:6px 10px"><table class="grid"><thead><tr><th>Bank account</th>`;
+    for(const {task,st} of cols.filter(c=>c.task.perBank)){ const cls=st.complete?'done':st.overdue?'over':''; html+=`<th class="c">${task.label.replace('bank account','')}<span class="sub"><span class="due ${cls}">${st.complete?'Complete':(st.overdue?'Overdue · ':'')+(startDate(task,p)&&!st.overdue?fmt(startDate(task,p))+'–'+st.due.getDate():'Due '+fmt(st.due))}</span></span></th>`; }
+    html+=`</tr></thead><tbody>`;
+    for(const b of C.banks){
+      const all=cols.every(({task})=>task.perBank?get(p,task.id+':'+b.id):true);
+      html+=`<tr class="${all?'alldone':''}"><td><div class="name">${b.name}</div><div class="props">${b.properties.join(' · ')}</div>${b.note?`<div class="note">⚠ ${b.note}</div>`:''}</td>`;
+      for(const {task} of cols.filter(c=>c.task.perBank)){ const k=task.id+':'+b.id; const st=get(p,k); html+=`<td class="c"><input type="checkbox" data-p="${p}" data-k="${k}" ${st?'checked':''}>${st?`<div class="meta">${st.by?st.by+' · ':''}${fmtAt(st.at)}</div>`:''}</td>`; }
+      html+=`</tr>`;
     }
+    html+=`</tbody></table></div>`;
+    const extra=cols.filter(c=>!c.task.perBank);
+    if(extra.length){ html+=`<div class="card"><h3>Month-end</h3>`; for(const {task,st} of extra){ const cls=st.complete?'done':st.overdue?'over':''; html+=rowHtml(p,task.id,task.label,`<span class="due ${cls}">${st.complete?'Complete':(st.overdue?'Overdue · ':'Due ')+fmt(st.due)}</span>`,''); } html+=`</div>`; }
     $('#view').innerHTML=html;
     $('#prev').onclick=()=>{period=shift(period,-1);render()}; $('#next').onclick=()=>{period=shift(period,1);render()};
     $('#thisMonth').onclick=()=>{period=shift(ym(today),-1);render()};
@@ -245,8 +264,9 @@
 
   function eventsIn(cm){ // all deadlines landing in calendar month cm
     const [y,m]=cm.split('-').map(Number); const evs=[];
-    for(const task of C.monthly){ for(const off of [0,-1,-2]){ const p=shift(cm,off); const d=dueDate(task,p); if(d.getFullYear()===y&&d.getMonth()===m-1){ const st=taskStatus(task,p); evs.push({day:d.getDate(),label:`${task.label}${task.perBank?'s':''} – ${MONTHS[Number(p.slice(5))-1].slice(0,3)}${task.perBank?` (${st.done}/${st.total})`:''}`,cls:st.complete?'done':st.overdue?'over':'pending',go:()=>{view='checklist';period=p;render()}}); } } }
-    for(const t of C.yearly){ if(Number(t.dueDate.slice(0,2))===m){ const p='yearly-'+y; const s=get(p,t.id); const d=new Date(y,m-1,Number(t.dueDate.slice(3))); evs.push({day:d.getDate(),label:t.label,cls:s?'done':d<today?'over':'pending',go:()=>{view='yearly';year=y;render()}}); } }
+    for(const task of C.monthly){ for(const off of [0,-1,-2]){ const p=shift(cm,off); const d=dueDate(task,p); if(d.getFullYear()===y&&d.getMonth()===m-1){ const st=taskStatus(task,p); const sd=startDate(task,p); const first=sd?sd.getDate():d.getDate(); const short=task.label.replace(/ bank account| GL/,'');
+      for(let day=first;day<=d.getDate();day++){ evs.push({day,isDue:day===d.getDate(),label:`${day===first?task.label.replace('bank account','banks'):short} – ${MONTHS[Number(p.slice(5))-1].slice(0,3)}${task.perBank?` (${st.done}/${st.total})`:''}`,cls:st.complete?'done':st.overdue?'over':'pending',go:()=>{view='checklist';period=p;render()}}); } } } }
+    for(const t of C.yearly){ if(Number(t.dueDate.slice(0,2))===m){ const p='yearly-'+y; const s=get(p,t.id); const d=new Date(y,m-1,Number(t.dueDate.slice(3))); evs.push({day:d.getDate(),isDue:true,label:t.label,cls:s?'done':d<today?'over':'pending',go:()=>{view='yearly';year=y;render()}}); } }
     return evs;
   }
 
@@ -260,7 +280,7 @@
     const tail=(7-(start+days)%7)%7; for(let i=1;i<=tail;i++) html+=`<div class="day out"><div class="n">${i}</div></div>`;
     html+=`</div><div class="legend"><span><b style="background:var(--accent)"></b>Upcoming</span><span><b style="background:var(--bad)"></b>Overdue</span><span><b style="background:var(--ok)"></b>Complete</span></div>`;
     // upcoming list (next 60 days)
-    const up=[]; for(let off=0;off<3;off++){ const cm=shift(ym(today),off); eventsIn(cm).forEach(e=>{ const d=new Date(Number(cm.slice(0,4)),Number(cm.slice(5))-1,e.day); if(e.cls!=='done'&&d<=new Date(today.getTime()+60*864e5)) up.push({e,d}); }); }
+    const up=[]; for(let off=0;off<3;off++){ const cm=shift(ym(today),off); eventsIn(cm).forEach(e=>{ const d=new Date(Number(cm.slice(0,4)),Number(cm.slice(5))-1,e.day); if(e.cls!=='done'&&e.isDue!==false&&d<=new Date(today.getTime()+60*864e5)) up.push({e,d}); }); }
     up.sort((a,b)=>a.d-b.d);
     html+=`<div class="card upcoming"><h3>Open deadlines – next 60 days</h3>${up.length?up.map(({e,d})=>`<div class="row"><span class="due ${e.cls==='over'?'over':''}" style="min-width:64px;text-align:center">${fmt(d)}</span><div class="body"><div class="name">${e.label}</div></div></div>`).join(''):'<div class="empty">Nothing open. 🎉</div>'}</div>`;
     $('#view').innerHTML=html;

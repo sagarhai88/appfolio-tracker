@@ -37,8 +37,7 @@ window.TRACKER_CONFIG = {
     { id: "cockrell-pinnacle",  name: "Cockrell Hill Pinnacle",
       properties: ["Cockrell Hill – 5815 S Cockrell Hill Rd, Dallas", "Vacant Lots – Cockrell Hill"] },
     { id: "cockrell-partners",  name: "Cockrell Hill Partners, INC",
-      properties: ["Vacant Lot – 13228 Trinity Blvd, Euless", "12977 Trinity Blvd Ste 105, Euless"],
-      note: "Not activated for payments in AppFolio" },
+      properties: ["Vacant Lot – 13228 Trinity Blvd, Euless", "12977 Trinity Blvd Ste 105, Euless"] },
     { id: "dummy",              name: "Dummy",
       properties: ["2657 Northaven Rd, Dallas", "2667 Northaven Rd, Dallas"],
       note: "Placeholder bank in AppFolio — confirm whether this needs reconciling" },
@@ -50,21 +49,22 @@ window.TRACKER_CONFIG = {
     { id: "palmhurst",          name: "Palmhurst Properties, LLC",
       properties: ["Palmhurst Shopping Center – Palmhurst, TX"] },
     { id: "shoppes-square",     name: "Shoppes At The Square LLC",
-      properties: ["1500 N Old Decatur Rd – Saginaw, TX"],
-      note: "Not activated for payments in AppFolio" },
+      properties: ["1500 N Old Decatur Rd – Saginaw, TX"] },
     { id: "tx-family",          name: "TX Family Holdings LLC",
-      properties: ["93 County St – Taunton, MA"],
-      note: "Not activated for payments in AppFolio" },
+      properties: ["93 County St – Taunton, MA"] },
     { id: "wazicap-hoa",        name: "WaziCap HOA Management",
       properties: ["Sight Condominium Association – 1111 Raiford Rd, Carrollton"] },
   ],
 
-  // Monthly tasks. "dueDay" = day of the FOLLOWING month the task is due
-  // (e.g. September's reconciliations are due October 15).
-  // Set followingMonth:false to make it due within the same month.
+  // Monthly tasks — per-bank tasks are a checkbox column next to every bank;
+  // others are a single checkbox for the month.
+  //   dueDay:        day the task is due ("last" = last day of the month)
+  //   startDay:      optional — first day of the working window (shown on the calendar)
+  //   followingMonth: true = due in the month AFTER the period (Sept work done in October)
   monthly: [
-    { id: "recon",         label: "Reconcile bank account", perBank: true,  dueDay: 15, followingMonth: true },
-    { id: "rent-receipts", label: "Enter rent receipts",    perBank: false, dueDay: 5,  followingMonth: false },
+    { id: "recon",         label: "Reconcile bank account", perBank: true,  startDay: 1, dueDay: 6,      followingMonth: true  },
+    { id: "rent-receipts", label: "Enter rent receipts",    perBank: true,  dueDay: 5,                   followingMonth: false },
+    { id: "placeholder-gl",label: "Clean up PLACEHOLDER GL",perBank: false, dueDay: "last",              followingMonth: false },
   ],
 
   // Yearly tasks. "dueDate" is MM-DD. Add as needed.
