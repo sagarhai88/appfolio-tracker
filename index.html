@@ -171,15 +171,14 @@
 
   async function load(){
     const cached = ls.get('tracker.status'); if(cached){ try{status=JSON.parse(cached)}catch{} }
-    if(!(C.sync&&C.sync.repo)){ banner('Running in this-browser-only mode. Set sync.repo in config.js to share checkmarks with the team.'); return; }
+    if(!(C.sync&&C.sync.repo)) return;
     try{
       const r = await fetch(api(),{headers:hdrs(),cache:'no-store'});
-      if(r.status===404){ sha=null; if(!token()) banner('No GitHub token set — checkmarks will only save in this browser. Add one in Settings.'); return; }
+      if(r.status===404){ sha=null; return; }
       if(!r.ok) throw new Error(r.status+' '+r.statusText);
       const j = await r.json(); sha=j.sha; status=JSON.parse(b64dec(j.content)||'{}');
       ls.set('tracker.status',JSON.stringify(status));
-      if(!token()) banner('Viewing shared status (read-only). Add a GitHub token in Settings to save checkmarks for the team.');
-      else banner('Synced with GitHub.','ok',2500);
+      if(token()) banner('Synced with GitHub.','ok',2500);
     }catch(e){ banner('Could not load shared status from GitHub ('+e.message+'). Showing local copy.','bad'); }
   }
 
@@ -207,7 +206,7 @@
 
   // ---------- helpers ----------
   const get = (p,k) => (status[p]||{})[k];
-  function setDone(p,k,done){ status[p]=status[p]||{}; if(done) status[p][k]={done:true,by:name(),at:new Date().toISOString()}; else delete status[p][k]; queueSave(); render(); }
+  function setDone(p,k,done){ if(C.sync&&C.sync.repo&&!token()) banner('Saved in this browser only — add your GitHub token in Settings so the team sees it.','',6000); status[p]=status[p]||{}; if(done) status[p][k]={done:true,by:name(),at:new Date().toISOString()}; else delete status[p][k]; queueSave(); render(); }
   function dueDate(task,p){ const [y,m]=p.split('-').map(Number); const mm=m-1+(task.followingMonth?1:0); return task.dueDay==='last'?new Date(y,mm+1,0):new Date(y,mm,task.dueDay||1); }
   function startDate(task,p){ if(!task.startDay) return null; const [y,m]=p.split('-').map(Number); return new Date(y,m-1+(task.followingMonth?1:0),task.startDay); }
   const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
