@@ -1,5 +1,5 @@
 {
-  "2026-09": {
+  "2026-10": {
     "recon:1280-loop-288": {
       "done": true,
       "by": "Wajih Naqvi",
@@ -20,6 +20,48 @@
       "by": "Wajih Naqvi",
       "at": "2026-10-09T16:07:03.504Z"
     },
+    "recon:trinity": {
+      "done": true,
+      "by": "Wajih Naqvi",
+      "at": "2026-10-09T16:07:15.966Z"
+    },
+    "recon:palmhurst": {
+      "done": true,
+      "by": "Wajih Naqvi",
+      "at": "2026-10-09T16:07:24.796Z"
+    },
+    "recon:wazicap-hoa": {
+      "done": true,
+      "by": "Sagar",
+      "at": "2026-10-09T16:18:01.940Z"
+    },
+    "recon:cockrell-pinnacle": {
+      "done": true,
+      "by": "Wajih Naqvi",
+      "at": "2026-10-09T16:36:35.769Z"
+    },
+    "recon:cockrell-partners": {
+      "done": true,
+      "by": "Wajih Naqvi",
+      "at": "2026-10-09T16:42:38.164Z"
+    },
+    "recon:c-store-wholesaler": {
+      "done": true,
+      "by": "Wajih Naqvi",
+      "at": "2026-10-09T16:44:15.065Z"
+    },
+    "recon:shoppes-square": {
+      "done": true,
+      "by": "Wajih Naqvi",
+      "at": "2026-10-09T17:04:47.499Z"
+    },
+    "recon:fd-portfolios": {
+      "done": true,
+      "by": "Wajih Naqvi",
+      "at": "2026-10-09T19:40:36.078Z"
+    }
+  },
+  "2026-09": {
     "rent-receipts:1320-evansville": {
       "done": true,
       "by": "Wajih Naqvi",
@@ -35,20 +77,10 @@
       "by": "Wajih Naqvi",
       "at": "2026-10-09T16:07:12.365Z"
     },
-    "recon:trinity": {
-      "done": true,
-      "by": "Wajih Naqvi",
-      "at": "2026-10-09T16:07:15.966Z"
-    },
     "rent-receipts:trinity": {
       "done": true,
       "by": "Wajih Naqvi",
       "at": "2026-10-09T16:07:17.064Z"
-    },
-    "recon:palmhurst": {
-      "done": true,
-      "by": "Wajih Naqvi",
-      "at": "2026-10-09T16:07:24.796Z"
     },
     "rent-receipts:palmhurst": {
       "done": true,
@@ -65,55 +97,25 @@
       "by": "Sagar",
       "at": "2026-10-09T16:17:59.516Z"
     },
-    "recon:wazicap-hoa": {
-      "done": true,
-      "by": "Sagar",
-      "at": "2026-10-09T16:18:01.940Z"
-    },
     "rent-receipts:wazicap-hoa": {
       "done": true,
       "by": "Sagar",
       "at": "2026-10-09T16:18:02.555Z"
-    },
-    "recon:cockrell-pinnacle": {
-      "done": true,
-      "by": "Wajih Naqvi",
-      "at": "2026-10-09T16:36:35.769Z"
     },
     "rent-receipts:cockrell-pinnacle": {
       "done": true,
       "by": "Wajih Naqvi",
       "at": "2026-10-09T16:36:36.636Z"
     },
-    "recon:cockrell-partners": {
-      "done": true,
-      "by": "Wajih Naqvi",
-      "at": "2026-10-09T16:42:38.164Z"
-    },
     "rent-receipts:cockrell-partners": {
       "done": true,
       "by": "Wajih Naqvi",
       "at": "2026-10-09T16:42:39.229Z"
     },
-    "recon:c-store-wholesaler": {
-      "done": true,
-      "by": "Wajih Naqvi",
-      "at": "2026-10-09T16:44:15.065Z"
-    },
     "rent-receipts:c-store-wholesaler": {
       "done": true,
       "by": "Wajih Naqvi",
       "at": "2026-10-09T16:44:15.780Z"
-    },
-    "recon:shoppes-square": {
-      "done": true,
-      "by": "Wajih Naqvi",
-      "at": "2026-10-09T17:04:47.499Z"
-    },
-    "recon:fd-portfolios": {
-      "done": true,
-      "by": "Wajih Naqvi",
-      "at": "2026-10-09T19:40:36.078Z"
     },
     "rent-receipts:fd-portfolios": {
       "done": true,

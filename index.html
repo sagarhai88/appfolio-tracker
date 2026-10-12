@@ -77,6 +77,7 @@
   table.grid .props{color:var(--muted);font-size:12px;margin-top:1px}
   table.grid .note{color:var(--warn);font-size:12px;margin-top:1px}
   table.grid tr.alldone .name{color:var(--muted)}
+  table.grid th .for{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:var(--text)}
   table.grid th .sub{display:block;font-weight:500;letter-spacing:0;text-transform:none;margin-top:2px}
   table.grid th .selall{display:block;margin:6px auto 0;font-size:11px;padding:2px 7px;text-transform:none;letter-spacing:0;font-weight:500}
   @media (max-width:600px){ table.grid th.c,table.grid td.c{width:70px} table.grid .props{display:none} }
@@ -164,7 +165,7 @@
   let status = {};            // { "2026-09": { "recon:1280-loop-288": {done,by,at}, ... }, "yearly": { "2026": {...} } }
   let sha = null;             // sha of status.json in repo
   let view = 'checklist';
-  let period = (()=>{ const d=new Date(today); d.setMonth(d.getMonth()-1); return ym(d); })(); // default: last month
+  let period = ym(today); // default: current month
   let calMonth = ym(today);
   let year = today.getFullYear();
   const ls = { get:k=>{try{return localStorage.getItem(k)}catch{return null}}, set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}} };
@@ -216,8 +217,9 @@
   // ---------- helpers ----------
   const get = (p,k) => (status[p]||{})[k];
   function setDone(p,k,done){ if(C.sync&&C.sync.repo&&!token()) banner('Saved in this browser only — add your GitHub token in Settings so the team sees it.','',6000); status[p]=status[p]||{}; if(done) status[p][k]={done:true,by:name(),at:new Date().toISOString()}; else delete status[p][k]; queueSave(); render(); }
-  function dueDate(task,p){ if(p.startsWith('yearly-')){ const y=Number(p.slice(7)); return new Date(y,Number(task.dueDate.slice(0,2))-1,Number(task.dueDate.slice(3))); } const [y,m]=p.split('-').map(Number); const mm=m-1+(task.followingMonth?1:0); return task.dueDay==='last'?new Date(y,mm+1,0):new Date(y,mm,task.dueDay||1); }
-  function startDate(task,p){ if(!task.startDay||p.startsWith('yearly-')) return null; const [y,m]=p.split('-').map(Number); return new Date(y,m-1+(task.followingMonth?1:0),task.startDay); }
+  function dueDate(task,p){ if(p.startsWith('yearly-')){ const y=Number(p.slice(7)); return new Date(y,Number(task.dueDate.slice(0,2))-1,Number(task.dueDate.slice(3))); } const [y,m]=p.split('-').map(Number); const mm=m-1; return task.dueDay==='last'?new Date(y,mm+1,0):new Date(y,mm,task.dueDay||1); }
+  function startDate(task,p){ if(!task.startDay||p.startsWith('yearly-')) return null; const [y,m]=p.split('-').map(Number); return new Date(y,m-1,task.startDay); }
+  function taskTitle(task,p){ if(!task.forPrior) return task.label.replace('bank account',''); const q=shift(p,-1); return task.label.replace('bank account','')+` <span class="for">${MONTHS[Number(q.slice(5))-1].slice(0,3)} statements</span>`; }
   const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
   const fmtAt = iso => new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'});
   function periodLabel(p){ const [y,m]=p.split('-').map(Number); return MONTHS[m-1]+' '+y; }
@@ -245,7 +247,7 @@
     const pb=cols.filter(c=>c.task.perBank);
     if(pb.length){
       html+=`<div class="card" style="padding:6px 10px"><table class="grid"><thead><tr><th>Bank account</th>`;
-      for(const {task,st} of pb){ const cls=st.complete?'done':st.overdue?'over':''; const sd=startDate(task,p); html+=`<th class="c">${task.label.replace('bank account','')}<span class="sub"><span class="due ${cls}">${st.complete?'Complete':(st.overdue?'Overdue · ':'')+(sd&&!st.overdue?fmt(sd)+'–'+st.due.getDate():'Due '+fmt(st.due))}</span></span><button class="btn small selall" data-task="${task.id}" data-all="${st.complete?0:1}">${st.complete?'Clear all':'Select all'}</button></th>`; }
+      for(const {task,st} of pb){ const cls=st.complete?'done':st.overdue?'over':''; const sd=startDate(task,p); html+=`<th class="c">${taskTitle(task,p)}<span class="sub"><span class="due ${cls}">${st.complete?'Complete':(st.overdue?'Overdue · ':'')+(sd&&!st.overdue?fmt(sd)+'–'+st.due.getDate():'Due '+fmt(st.due))}</span></span><button class="btn small selall" data-task="${task.id}" data-all="${st.complete?0:1}">${st.complete?'Clear all':'Select all'}</button></th>`; }
       html+=`</tr></thead><tbody>`;
       for(const b of C.banks){
         const all=pb.every(({task})=>get(p,task.id+':'+b.id));
@@ -267,11 +269,11 @@
 
   function renderChecklist(){
     const p=period;
-    let html=`<div class="nav"><button class="btn small" id="prev">‹</button><h2>${periodLabel(p)}</h2><button class="btn small" id="next">›</button><div class="spacer"></div><button class="btn small" id="thisMonth">Last month</button></div>`;
+    let html=`<div class="nav"><button class="btn small" id="prev">‹</button><h2>${periodLabel(p)}</h2><button class="btn small" id="next">›</button><div class="spacer"></div><button class="btn small" id="thisMonth">This month</button></div>`;
     html+=gridHtml(p,C.monthly);
     $('#view').innerHTML=html;
     $('#prev').onclick=()=>{period=shift(period,-1);render()}; $('#next').onclick=()=>{period=shift(period,1);render()};
-    $('#thisMonth').onclick=()=>{period=shift(ym(today),-1);render()};
+    $('#thisMonth').onclick=()=>{period=ym(today);render()};
     bindGrid(p);
   }
 
@@ -286,8 +288,8 @@
 
   function eventsIn(cm){ // all deadlines landing in calendar month cm
     const [y,m]=cm.split('-').map(Number); const evs=[];
-    for(const task of C.monthly){ for(const off of [0,-1,-2]){ const p=shift(cm,off); const d=dueDate(task,p); if(d.getFullYear()===y&&d.getMonth()===m-1){ const st=taskStatus(task,p); const sd=startDate(task,p); const first=sd?sd.getDate():d.getDate(); const short=task.label.replace(/ bank account| GL/,'');
-      for(let day=first;day<=d.getDate();day++){ evs.push({day,isDue:day===d.getDate(),label:`${day===first?task.label.replace('bank account','banks'):short} – ${MONTHS[Number(p.slice(5))-1].slice(0,3)}${task.perBank?` (${st.done}/${st.total})`:''}`,cls:st.complete?'done':st.overdue?'over':'pending',go:()=>{view='checklist';period=p;render()}}); } } } }
+    for(const task of C.monthly){ const p=cm; const d=dueDate(task,p); const st=taskStatus(task,p); const sd=startDate(task,p); const first=sd?sd.getDate():d.getDate(); const short=task.label.replace(/ bank account| GL/,''); const forTxt=task.forPrior?' – '+MONTHS[Number(shift(p,-1).slice(5))-1].slice(0,3)+' stmts':'';
+      for(let day=first;day<=d.getDate();day++){ evs.push({day,isDue:day===d.getDate(),label:`${day===first?task.label.replace('bank account','banks'):short}${forTxt}${task.perBank?` (${st.done}/${st.total})`:''}`,cls:st.complete?'done':st.overdue?'over':'pending',go:()=>{view='checklist';period=p;render()}}); } }
     for(const t of C.yearly){ if(Number(t.dueDate.slice(0,2))===m){ const p='yearly-'+y; const st=taskStatus(t,p); evs.push({day:st.due.getDate(),isDue:true,label:`${t.label}${t.perBank?` (${st.done}/${st.total})`:''}`,cls:st.complete?'done':st.overdue?'over':'pending',go:()=>{view='yearly';year=y;render()}}); } }
     return evs;
   }
