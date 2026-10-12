@@ -60,7 +60,7 @@ window.TRACKER_CONFIG = {
   //   startDay: optional first day of the working window (shown on the calendar)
   //   forPrior: true = the task is about the previous month (Oct page: "Reconcile – Sep statements")
   monthly: [
-    { id: "recon",         label: "Reconcile bank account", perBank: true,  startDay: 1, dueDay: 7,      forPrior: true  },
+    { id: "recon",         label: "Reconcile previous month", perBank: true, startDay: 1, dueDay: 7, forPrior: true },
     { id: "rent-receipts", label: "Enter rent receipts",    perBank: true,  dueDay: 5                                    },
     { id: "placeholder-gl",label: "Clean up PLACEHOLDER GL",perBank: false, dueDay: "last"                               },
   ],

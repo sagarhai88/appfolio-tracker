@@ -219,7 +219,7 @@
   function setDone(p,k,done){ if(C.sync&&C.sync.repo&&!token()) banner('Saved in this browser only — add your GitHub token in Settings so the team sees it.','',6000); status[p]=status[p]||{}; if(done) status[p][k]={done:true,by:name(),at:new Date().toISOString()}; else delete status[p][k]; queueSave(); render(); }
   function dueDate(task,p){ if(p.startsWith('yearly-')){ const y=Number(p.slice(7)); return new Date(y,Number(task.dueDate.slice(0,2))-1,Number(task.dueDate.slice(3))); } const [y,m]=p.split('-').map(Number); const mm=m-1; return task.dueDay==='last'?new Date(y,mm+1,0):new Date(y,mm,task.dueDay||1); }
   function startDate(task,p){ if(!task.startDay||p.startsWith('yearly-')) return null; const [y,m]=p.split('-').map(Number); return new Date(y,m-1,task.startDay); }
-  function taskTitle(task,p){ if(!task.forPrior) return task.label.replace('bank account',''); const q=shift(p,-1); return task.label.replace('bank account','')+` <span class="for">${MONTHS[Number(q.slice(5))-1].slice(0,3)} statements</span>`; }
+  function taskTitle(task,p){ return task.label.replace('bank account',''); }
   const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
   const fmtAt = iso => new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'});
   function periodLabel(p){ const [y,m]=p.split('-').map(Number); return MONTHS[m-1]+' '+y; }
@@ -288,7 +288,7 @@
 
   function eventsIn(cm){ // all deadlines landing in calendar month cm
     const [y,m]=cm.split('-').map(Number); const evs=[];
-    for(const task of C.monthly){ const p=cm; const d=dueDate(task,p); const st=taskStatus(task,p); const sd=startDate(task,p); const first=sd?sd.getDate():d.getDate(); const short=task.label.replace(/ bank account| GL/,''); const forTxt=task.forPrior?' – '+MONTHS[Number(shift(p,-1).slice(5))-1].slice(0,3)+' stmts':'';
+    for(const task of C.monthly){ const p=cm; const d=dueDate(task,p); const st=taskStatus(task,p); const sd=startDate(task,p); const first=sd?sd.getDate():d.getDate(); const short=task.label.replace(/ bank account| GL| previous month/,''); const forTxt='';
       for(let day=first;day<=d.getDate();day++){ evs.push({day,isDue:day===d.getDate(),label:`${day===first?task.label.replace('bank account','banks'):short}${forTxt}${task.perBank?` (${st.done}/${st.total})`:''}`,cls:st.complete?'done':st.overdue?'over':'pending',go:()=>{view='checklist';period=p;render()}}); } }
     for(const t of C.yearly){ if(Number(t.dueDate.slice(0,2))===m){ const p='yearly-'+y; const st=taskStatus(t,p); evs.push({day:st.due.getDate(),isDue:true,label:`${t.label}${t.perBank?` (${st.done}/${st.total})`:''}`,cls:st.complete?'done':st.overdue?'over':'pending',go:()=>{view='yearly';year=y;render()}}); } }
     return evs;
