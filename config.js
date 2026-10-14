@@ -70,4 +70,25 @@ window.TRACKER_CONFIG = {
     { id: "budget", label: "Create next year budget", perBank: true, dueDate: "12-15" },
     { id: "cam",    label: "Set up CAM for tenants",  perBank: true, dueDate: "12-15" },
   ],
+
+  // Family Dollar reimbursements — one row per store (all entities), shown on the Yearly tab.
+  familyDollar: {
+    title: "Family Dollar – tax & insurance reimbursements",
+    locations: [
+      { id: "fd-dunkirk",      name: "Dunkirk, IN",      address: "1153 S Main St",            entity: "C Store Wholesaler LLC" },
+      { id: "fd-rossville",    name: "Rossville, GA",    address: "824 Mission Ridge Rd",      entity: "C Store Wholesaler LLC" },
+      { id: "fd-baldwin",      name: "Baldwin, LA",      address: "910 Main Street",           entity: "FD Portfolios LLC" },
+      { id: "fd-lufkin",       name: "Lufkin, TX",       address: "2500 E. Denman Ave",        entity: "FD Portfolios LLC" },
+      { id: "fd-newton",       name: "Newton, TX",       address: "515 West Court St.",        entity: "FD Portfolios LLC" },
+      { id: "fd-oberlin",      name: "Oberlin, LA",      address: "8702 U.S. Highway 165",     entity: "FD Portfolios LLC" },
+      { id: "fd-ozark",        name: "Ozark, AR",        address: "1008 W. Commercial St.",    entity: "FD Portfolios LLC" },
+      { id: "fd-pine-prairie", name: "Pine Prairie, LA", address: "10729 Veteran Memorial",    entity: "FD Portfolios LLC" },
+    ],
+    tasks: [
+      { id: "fd-tax-req", label: "Property tax – requested", dueDate: "12-15" },
+      { id: "fd-tax-rec", label: "Property tax – received",  dueDate: "12-15" },
+      { id: "fd-ins-req", label: "Insurance – requested",    dueDate: "12-15" },
+      { id: "fd-ins-rec", label: "Insurance – received",     dueDate: "12-15" },
+    ],
+  },
 };
