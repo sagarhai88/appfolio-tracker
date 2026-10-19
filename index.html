@@ -82,6 +82,10 @@
   table.grid th .sub{display:block;font-weight:500;letter-spacing:0;text-transform:none;margin-top:2px}
   table.grid th .selall{display:block;margin:6px auto 0;font-size:11px;padding:2px 7px;text-transform:none;letter-spacing:0;font-weight:500}
   @media (max-width:600px){ table.grid th.c,table.grid td.c{width:70px} table.grid .props{display:none} }
+  table.grid tr.toggle td{padding:0;background:var(--surface)!important;border-bottom:1px solid var(--line)}
+  .tbtn{all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;padding:6px 6px 6px 22px;font-size:12.5px;color:var(--accent);font-weight:500}
+  .tbtn:hover{background:var(--accent-soft)}
+  .tbtn .flag{color:var(--bad);font-weight:600}
   table.grid tr.prop td{background:var(--surface-2)!important;padding:5px 6px 5px 22px;border-bottom:1px solid var(--line)}
   table.grid .pname{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
   table.grid tr.tenant td{padding:6px 6px 6px 36px;background:var(--surface)!important}
@@ -176,6 +180,7 @@
   let status = {};            // { "2026-09": { "recon:1280-loop-288": {done,by,at}, ... }, "yearly": { "2026": {...} } }
   let sha = null;             // sha of status.json in repo
   let view = 'checklist';
+  let open = {}; try{ open=JSON.parse(localStorage.getItem('tracker.open')||'{}') }catch{}
   let period = ym(today); // default: current month
   let calMonth = ym(today);
   let year = today.getFullYear();
@@ -271,9 +276,9 @@
         for(const {task} of pb){ const k=task.id+':'+b.id; const st=get(p,k); html+=`<td class="c"><input type="checkbox" data-p="${p}" data-k="${k}" ${st?'checked':''}>${st?`<div class="meta">${st.by?st.by+' · ':''}${fmtAt(st.at)}</div>`:''}</td>`; }
         if(hasTenants) html+=`<td class="c tcol"></td>`;
         html+=`</tr>`;
-        if(hasTenants){ for(const pr of (b.properties||[])){ if(typeof pr==='string'||!(pr.tenants||[]).length) continue;
-          html+=`<tr class="prop"><td colspan="${1+pb.length+pt.length}"><div class="pname">${pr.name}</div></td></tr>`;
-          for(const t of pr.tenants){ html+=`<tr class="tenant"><td><div class="tname">${t.name}<span class="unit">${t.unit}</span>${t.status?`<span class="tstatus">${t.status}</span>`:''}</div></td>`;
+        if(hasTenants){ const ts=tenantsOf(b); if(ts.length){ const isOpen=!!open[b.id]; const flagged=ts.filter(x=>pt.some(({task})=>get(p,task.id+':'+b.id+':'+x.t.id))).length;
+          html+=`<tr class="toggle"><td colspan="${1+pb.length+pt.length}"><button class="tbtn" data-bank="${b.id}">${isOpen?'▾':'▸'} ${ts.length} tenant${ts.length>1?'s':''}${flagged?` · <span class="flag">${flagged} past due</span>`:''}</button></td></tr>`;
+          if(isOpen) for(const {t,pr} of ts){ html+=`<tr class="tenant"><td><div class="tname">${t.name}<span class="unit">${pr.short||''}${pr.short&&t.unit?' · ':''}${t.unit}</span>${t.status?`<span class="tstatus">${t.status}</span>`:''}</div></td>`;
             for(const _ of pb) html+=`<td class="c"></td>`;
             for(const {task} of pt){ const k=task.id+':'+b.id+':'+t.id; const st=get(p,k); html+=`<td class="c tcol"><input type="checkbox" data-p="${p}" data-k="${k}" ${st?'checked':''}>${st?`<div class="meta">${st.by?st.by+' · ':''}${fmtAt(st.at)}</div>`:''}</td>`; }
             html+=`</tr>`; } } }
@@ -286,6 +291,7 @@
     return html;
   }
   function bindGrid(p){
+    document.querySelectorAll('.tbtn').forEach(btn=>btn.onclick=()=>{ open[btn.dataset.bank]=!open[btn.dataset.bank]; try{localStorage.setItem('tracker.open',JSON.stringify(open))}catch{} render(); });
     document.querySelectorAll('.selall').forEach(btn=>btn.onclick=()=>{ const all=btn.dataset.all==='1'; const t=btn.dataset.task; const task=[...C.monthly,...C.yearly,...((C.familyDollar&&C.familyDollar.tasks)||[]).map(x=>Object.assign({rows:C.familyDollar.locations},x))].find(x=>x.id===t); status[p]=status[p]||{}; for(const b of rowsFor(task)){ const k=t+':'+b.id; if(all) status[p][k]={done:true,by:name(),at:new Date().toISOString()}; else delete status[p][k]; } if(C.sync&&C.sync.repo&&!token()) banner('Saved in this browser only — add your GitHub token in Settings so the team sees it.','',6000); queueSave(); render(); });
     bindChecks();
   }

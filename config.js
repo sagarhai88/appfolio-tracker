@@ -52,12 +52,12 @@ window.TRACKER_CONFIG = {
     { id: "trinity", name: "Business Park at Trinity LLC",
       properties: [
         { name: "Trinity Business Park \u2013 Building A (12200 Trinity Blvd)", tenants: [] },
-        { name: "Trinity Business Park \u2013 Building B (12240 Trinity Blvd)", tenants: [
-          { id: "building-b-unit-1-daiohs-usa", unit: "Building B Unit 1", name: "Daiohs USA" },
-          { id: "building-b-unit-2-avyna-cosmetics", unit: "Building B Unit 2", name: "Avyna Cosmetics" },
+        { name: "Trinity Business Park \u2013 Building B (12240 Trinity Blvd)", short: "Bldg B", tenants: [
+          { id: "building-b-unit-1-daiohs-usa", unit: "Unit 1", name: "Daiohs USA" },
+          { id: "building-b-unit-2-avyna-cosmetics", unit: "Unit 2", name: "Avyna Cosmetics" },
         ] },
-        { name: "Trinity Business Park \u2013 Building C (12174 Trinity Blvd)", tenants: [
-          { id: "building-c-padel-growth-partners-llc", unit: "Building C", name: "Padel Growth Partners LLC" },
+        { name: "Trinity Business Park \u2013 Building C (12174 Trinity Blvd)", short: "Bldg C", tenants: [
+          { id: "building-c-padel-growth-partners-llc", unit: "", name: "Padel Growth Partners LLC" },
         ] },
       ] },
     { id: "c-store-wholesaler", name: "C Store Wholesaler LLC",
