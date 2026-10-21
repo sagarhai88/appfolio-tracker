@@ -79,7 +79,7 @@ window.TRACKER_CONFIG = {
         { name: "Vacant Lot \u2013 13228 Trinity Blvd, Euless", tenants: [] },
         { name: "12977 Trinity Blvd Ste 105, Euless", tenants: [] },
       ] },
-    { id: "dummy", name: "Dummy",
+    { id: "dummy", name: "Northaven Denton Drive Properties",
       properties: [
         { name: "2657 Northaven Rd, Dallas", tenants: [] },
         { name: "2667 Northaven Rd, Dallas", tenants: [] },
@@ -146,6 +146,7 @@ window.TRACKER_CONFIG = {
   monthly: [
     { id: "recon",         label: "Reconcile previous month", perBank: true, startDay: 1, dueDay: 7, forPrior: true },
     { id: "rent-receipts", label: "Enter rent receipts",    perBank: true,  dueDay: 5                                    },
+    { id: "owner-reports", label: "Owner reports",           perBank: false, dueDay: 8                                    },
     { id: "placeholder-gl",label: "Clean up PLACEHOLDER GL",perBank: false, dueDay: "last"                               },
     { id: "past-due",      label: "Past due",               perTenant: true                                             },
   ],
